@@ -8,16 +8,39 @@ a real integration would use.
 
 ## Run it
 
+The app uses Postgres (a free Supabase project) so the same database works locally and on Vercel.
+
+1. Create a free project at [supabase.com](https://supabase.com) and set a database password.
+2. In the Supabase dashboard click **Connect** → **ORMs** → **Prisma**: copy the two URIs it
+   shows into `.env` (see `.env.example` — `DATABASE_URL` is the transaction pooler on port
+   6543 with `?pgbouncer=true&connection_limit=1`, `DIRECT_URL` is the direct connection on
+   port 5432).
+3. Then:
+
 ```bash
 npm install
 npm run dev
 ```
 
-That's it — no external accounts, keys, or cloud services. First run creates `.env` from
-`.env.example`, pushes the Prisma schema into a local SQLite file, and seeds demo data.
-Open http://localhost:3000.
+First run pushes the Prisma schema and seeds demo data (seeding is idempotent — it skips if
+data already exists). Open http://localhost:3000.
 
 Reset to a fresh seeded database anytime with `npm run db:reset`.
+
+## Deploy to Vercel
+
+1. Push this repo to GitHub (done if you're reading this there) and import it at
+   [vercel.com/new](https://vercel.com/new). Framework auto-detects as Next.js; no build
+   settings to change.
+2. In the project's **Settings → Environment Variables**, add:
+   - `DATABASE_URL` — same pooler URI as above (`?pgbouncer=true&connection_limit=1` matters
+     on serverless)
+   - `DIRECT_URL` — same direct URI as above (used by `prisma db push` during the build)
+   - `NEXTAUTH_SECRET` — a long random string (`openssl rand -base64 32`)
+   - `NEXTAUTH_URL` — your production URL, e.g. `https://your-app.vercel.app` (add/update it
+     after the first deploy if you don't know it yet)
+3. Deploy. The build runs `prisma db push` + the idempotent seed, so the database is ready on
+   the first deploy with no manual step.
 
 ### Demo accounts
 

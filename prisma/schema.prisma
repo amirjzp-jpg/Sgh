@@ -3,11 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  // url: Supabase transaction pooler (port 6543) — what the app uses at runtime.
+  // directUrl: direct connection (port 5432) — used by `prisma db push`/migrations,
+  // which can't run through pgbouncer.
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-// SQLite via Prisma has no enums or scalar lists:
+// Kept portable across SQLite/Postgres (no enums or scalar lists):
 // - enum-like fields are Strings, validated with Zod at the API boundary
 // - Listing.images is a JSON-encoded string array
 
