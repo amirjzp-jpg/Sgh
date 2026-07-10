@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run db:prepare && next dev",
-    "build": "prisma db push --skip-generate && prisma db seed && next build",
+    "build": "node scripts/preflight.js && prisma db push --skip-generate && prisma db seed && next build",
     "start": "next start",
     "db:prepare": "node scripts/ensure-env.js && prisma db push --skip-generate && prisma db seed",
     "db:reset": "node scripts/ensure-env.js && prisma db push --force-reset --skip-generate && prisma db seed",
